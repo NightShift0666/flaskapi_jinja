@@ -123,7 +123,6 @@ def eliminar_producto(codigo):
     try:
         requests.delete(f"{API_URL}/codigo/{codigo}")
     except Exception as e:
-        print("Entro a eliminar producto")
         return f"Error al eliminar producto: {e}"
         
 

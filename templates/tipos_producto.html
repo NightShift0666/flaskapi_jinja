@@ -12,7 +12,7 @@
           action="{{ url_for('rutas_tipos_producto.crear_tipo_producto') if modo == 'crear' else url_for('rutas_tipos_producto.actualizar_tipo_producto') }}">
         
         <!-- Campo id -->
-        <input type="text" name="id" placeholder="Id"
+        <input type="number" name="id" placeholder="Id"
                value="{{ tipo_producto.id if tipo_producto else '' }}" required>
 
         <!-- Campo nombre -->
