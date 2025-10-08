@@ -1,38 +1,35 @@
 {% extends "base.html" %}
-
 {% block contenido %}
-    <h1>Gestión de Tipos de responsable</h1>
-
+    <h1>Gestión de tipos de proyecto</h1>
 
     <form method="post" 
-          action="{{ url_for('rutas_tipos_responsable.crear_tipo_responsable') if modo == 'crear' else url_for('rutas_tipos_responsable.actualizar_tipo_responsable') }}">
+          action="{{ url_for('rutas_tipos_proyecto.crear_tipo_proyecto') if modo == 'crear' else url_for('rutas_tipos_proyecto.actualizar_tipo_proyecto') }}">
         
         <!-- Campo id -->
-        <input type="number" name="id" placeholder="Id"
-               value="{{ tipo_responsable.id if tipo_responsable else '' }}" required>
+        <input type="text" name="id" placeholder="Id"
+               value="{{ tipo_proyecto.id if tipo_proyecto else '' }}" required>
 
-        <!-- Campo titulo -->
-        <input type="text" name="titulo" placeholder="Título"
-               value="{{ tipo_responsable.titulo if tipo_responsable else '' }}" required>
+        <!-- Campo nombre -->
+        <input type="text" name="nombre" placeholder="Nombre"
+               value="{{ tipo_proyecto.nombre if tipo_proyecto else '' }}" required>
 
         <!-- Campo descripcion -->
         <input type="text" name="descripcion" placeholder="Descripción"
-               value="{{ tipo_responsable.descripcion if tipo_responsable else '' }}" required>
+               value="{{ tipo_proyecto.descripcion if tipo_proyecto else '' }}" required>
 
         
         <!-- Botón que cambia dinámicamente -->
         <button type="submit">
             {{ "Crear" if modo == "crear" else "Actualizar" }}
         </button>
-    </form>
+    </form>   
 
-    
-    <form method="post" action="{{ url_for('rutas_tipos_responsable.buscar_tipo_responsable') }}">
+
+    <form method="post" action="{{ url_for('rutas_tipos_proyecto.buscar_tipo_proyecto') }}">
         <input type="text" name="id_buscar" placeholder="Buscar por id" required>
         <button type="submit">Buscar</button>
-    </form>
-
-    <!-- Mensaje de error o notificación -->
+    </form> 
+    
     {% if mensaje %}
         <p style="color: red;">{{ mensaje }}</p>
     {% endif %}
@@ -40,22 +37,22 @@
     <table border="1" cellpadding="5" cellspacing="0" style="margin: 20px auto;">
         <thead>
             <tr>
-                <th>Código</th>
-                <th>Título</th>
-                <th>Descripción</th>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Descripcion</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            {% for p in tipos_responsable %}
+            {% for p in tipos_proyecto %}
                 <tr>
                     <td>{{ p.id }}</td>
-                    <td>{{ p.titulo }}</td>
+                    <td>{{ p.nombre }}</td>
                     <td>{{ p.descripcion }}</td>
                     <td>
-
+                        <!-- Formulario para eliminar un producto -->
                         <form method="post" 
-                              action="{{ url_for('rutas_tipos_responsable.eliminar_tipo_responsable', id=p.id) }}">
+                              action="{{ url_for('rutas_tipos_proyecto.eliminar_tipo_proyecto', id=p.id) }}">
                             <button type="submit">Eliminar</button>
                         </form>
                     </td>
@@ -64,4 +61,3 @@
         </tbody>
     </table>
 {% endblock %}
-
