@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+    <h1>Gestión de Usuarios</h1>
+    <form method="post" 
+          action="{{ url_for('rutas_usuarios.crear_usuario') if modo == 'crear' else url_for('rutas_usuarios.actualizar_usuario') }}">
+        
+        <!-- Campo id -->
+        <input type="text" name="id" placeholder="Id"
+               value="{{ usuario.id if usuario else '' }}" required>
+
+        <!-- Campo email -->
+        <input type="text" name="email" placeholder="Email"
+               value="{{ usuario.email if usuario else '' }}" required>
+
+        <!-- Campo contrasena -->
+        <input type="text" name="contrasena" placeholder="Contraseña"
+               value="{{ usuario.contrasena if usuario else '' }}" required>
+
+        <!-- Campo ruta_avatar -->
+        <input type="text" name="ruta_avatar" placeholder="Ruta de avatar"
+               value="{{ usuario.ruta_avatar if usuario else '' }}" required>
+
+        <!-- Campo activo -->
+        <input type="text" name="activo" placeholder="Activo"
+               value="{{ usuario.activo if usuario else '' }}" required>
+       
+
+        <!-- Botón que cambia dinámicamente -->
+        <button type="submit">
+            {{ "Crear" if modo == "crear" else "Actualizar" }}
+        </button>
+    </form>
+
+
+    <form method="post" action="{{ url_for('rutas_usuarios.buscar_usuario') }}">
+        <input type="text" name="id_buscar" placeholder="Buscar por id" required>
+        <button type="submit">Buscar</button>
+    </form>
+
+    <!-- Mensaje de error o notificación -->
+    {% if mensaje %}
+        <p style="color: red;">{{ mensaje }}</p>
+    {% endif %}
+
+
+    <table border="1" cellpadding="5" cellspacing="0" style="margin: 20px auto;">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Email</th>
+                <th>Contrasena</th>
+                <th>Ruta de avatar</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in usuarios %}
+                <tr>
+                    <td>{{ p.id }}</td>
+                    <td>{{ p.email }}</td>
+                    <td>{{ p.contrasena }}</td>
+                    <td>{{ p.ruta_avatar}}</td>
+                    <td>{{ p.activo}}</td>
+                    <td>
+
+                        <form method="post" 
+                              action="{{ url_for('rutas_usuarios.eliminar_usuario', id=p.id) }}">
+                            <button type="submit">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
