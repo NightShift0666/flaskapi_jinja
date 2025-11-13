@@ -1,75 +1,54 @@
 {% extends "base.html" %}
 
 {% block contenido %}
-    <h1>Gestión de Entregables</h1>
+    <h1>Gestión de Responsables</h1>
 
     <form method="post" 
-          action="{{ url_for('rutas_entregables.crear_entregable') if modo == 'crear' else url_for('rutas_entregables.actualizar_entregable') }}">
+          action="{{ url_for('rutas_responsables.crear_responsable') if modo == 'crear' else url_for('rutas_responsables.actualizar_responsable') }}">
         
         <!-- Campo id -->
         {% if modo == 'actualizar' %}
             <input type="number" name="id" placeholder="Id"
-                   value="{{ entregable.id }}" readonly>
+                   value="{{ responsable.id }}" readonly>
         {% endif %}
 
-        <!-- Campo codigo -->
-        <input type="text" name="codigo" placeholder="Código"
-               value="{{ entregable.codigo if entregable else '' }}" required>
-
-        <!-- Campo titulo -->
-        <input type="text" name="titulo" placeholder="Título"
-               value="{{ entregable.titulo if entregable else '' }}" required>
-
-        <!-- Campo descripcion -->
-        <input type="text" name="descripcion" placeholder="Descripción"
-               value="{{ entregable.descripcion if entregable else '' }}" required>
-
-        <!-- Campo fecha_inicio -->
-        <input type="text" name="fecha_inicio" placeholder="Fecha de inicio"
-               value="{{ entregable.fecha_inicio if entregable else '' }}" required>
-        
-        <!-- Campo fecha_fin_prevista -->
-        <input type="text" name="fecha_fin_prevista" placeholder="Fecha de finalización prevista"
-               value="{{ entregable.fecha_fin_prevista if entregable else '' }}" required>
-               
-        <input type="hidden" name="fecha_modificacion" id="fechaModificacion">
-        
-        <!-- Campo fecha_finalizacion -->
-        <input type="text" name="fecha_finalizacion" placeholder="Fecha de finalización"
-               value="{{ entregable.fecha_finalizacion if entregable else '' }}" required>
-
-        <!-- NUEVO: Selector de responsables -->
-        <label for="responsables">Responsables asignados:</label>
-        <select name="responsables[]" id="responsables" multiple size="5" style="width: 100%; min-height: 100px;">
-            {% for resp in todos_responsables %}
-                <option value="{{ resp.id }}" 
-                        {% if entregable and entregable.responsables %}
-                            {% for r in entregable.responsables %}
-                                {% if r.id_responsable == resp.id or r.id == resp.id %}selected{% endif %}
-                            {% endfor %}
-                        {% endif %}>
-                    {{ resp.nombre }}
+        <!-- Campo id_tipo_responsable-->
+        <label for="id_tipo_responsable">Tipo de responsable:</label>
+        <select name="id_tipo_responsable" id="id_tipo_responsable" required>
+            <option value="">Seleccione un tipo</option>
+            {% for tipo in tipos_responsable %}
+                <option value="{{ tipo.id }}" 
+                        {% if responsable and responsable.id_tipo_responsable == tipo.id %}selected{% endif %}>
+                    {{ tipo.titulo }}  
                 </option>
             {% endfor %}
         </select>
-        <small>Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples responsables</small>
 
+        <!-- Campo id_usuario - SELECT -->
+        <label for="id_usuario">Usuario:</label>
+        <select name="id_usuario" id="id_usuario" required>
+            <option value="">Seleccione un usuario</option>
+            {% for usuario in usuarios %}
+                <option value="{{ usuario.id }}" 
+                        {% if responsable and responsable.id_usuario == usuario.id %}selected{% endif %}>
+                    {{ usuario.id }}  {# Ajusta según el campo que quieras mostrar #}
+                </option>
+            {% endfor %}
+        </select>
+
+        <!-- Campo nombre -->
+        <input type="text" name="nombre" placeholder="Nombre"
+               value="{{ responsable.nombre if responsable else '' }}" required>
+
+        
         <!-- Botón que cambia dinámicamente -->
         <button type="submit">
             {{ "Crear" if modo == "crear" else "Actualizar" }}
         </button>
     </form>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const inputTimestamp = document.getElementById('fechaModificacion');
-        const now = new Date();
-        const timestampFormateado = now.toISOString(); 
-        inputTimestamp.value = timestampFormateado;
-    });
-    </script>
 
-    <form method="post" action="{{ url_for('rutas_entregables.buscar_entregable') }}">
+    <form method="post" action="{{ url_for('rutas_responsables.buscar_responsable') }}">
         <input type="text" name="id_buscar" placeholder="Buscar por id" required>
         <button type="submit">Buscar</button>
     </form>
@@ -83,45 +62,30 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Código</th>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Fecha de inicio</th>
-                <th>Fecha de finalización prevista</th>
-                <th>Fecha de modificación</th>
-                <th>Fecha de finalización</th>
-                <th>Responsables</th> <!-- NUEVA COLUMNA -->
+                <th>Tipo de responsable</th>
+                <th>Id del usuario</th>
+                <th>Nombre</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            {% for p in entregables %}
+            {% for p in responsables %}
                 <tr>
                     <td>{{ p.id }}</td>
-                    <td>{{ p.codigo }}</td>
-                    <td>{{ p.titulo }}</td>
-                    <td>{{ p.descripcion }}</td>
-                    <td>{{ p.fecha_inicio }}</td>
-                    <td>{{ p.fecha_fin_prevista }}</td>
-                    <td>{{ p.fecha_modificacion }}</td>
-                    <td>{{ p.fecha_finalizacion }}</td>
                     <td>
-                        <!-- MOSTRAR RESPONSABLES -->
-                        {% if p.responsables %}
-                            {% for resp in p.responsables %}
-                                <span style="display: inline-block; background-color: #4CAF50; color: white; 
-                                             padding: 3px 8px; margin: 2px; border-radius: 3px; font-size: 0.85em;">
-                                    {{ resp.nombre or resp.responsable_nombre }}
-                                </span>
-                            {% endfor %}
-                        {% else %}
-                            <em style="color: #999;">Sin responsables</em>
-                        {% endif %}
-                    </td>
+               {% for tipo in tipos_responsable %}
+               {% if tipo.id == p.id_tipo_responsable %}
+               {{ tipo.titulo }}
+               {% endif %}
+               {% endfor %}
+             </td>
+                    <td>{{ p.id_usuario }}</td>
+                    <td>{{ p.nombre }}</td>
+
                     <td>
                         <!-- Formulario para eliminar un producto -->
                         <form method="post" 
-                              action="{{ url_for('rutas_entregables.eliminar_entregable', id=p.id) }}">
+                              action="{{ url_for('rutas_responsables.eliminar_responsable', id=p.id) }}">
                             <button type="submit">Eliminar</button>
                         </form>
                     </td>

@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block contenido %}
-<h1 class="mb-4 text-center fw-semibold">Gestión de Entregables</h1>
+<h1 class="mb-4 text-center">Gestión de Entregables</h1>
 
 <!-- Formulario Crear/Actualizar -->
-<div class="card shadow-sm mb-4 border-0">
+<div class="card shadow-sm mb-4">
     <div class="card-body">
-        <form method="post"
-              action="{{ url_for('rutas_entregables.crear_entregable') if modo == 'crear' else url_for('rutas_entregables.actualizar_entregable') }}"
+        <form method="post" 
+              action="{{ url_for('rutas_entregables.crear_entregable') if modo == 'crear' else url_for('rutas_entregables.actualizar_entregable') }}" 
               class="row g-3">
 
             {% if modo == 'actualizar' %}
@@ -51,7 +51,7 @@
 
             {% if modo == 'actualizar' %}
             <div class="col-12">
-                <label class="form-label">Asignar responsables</label>
+                <label for="responsables" class="form-label">Asignar responsables</label>
                 <select name="responsables[]" id="responsables" class="form-select" multiple>
                     {% for resp in todos_responsables %}
                         <option value="{{ resp.id }}"
@@ -69,7 +69,7 @@
             {% endif %}
 
             <div class="col-12 text-end">
-                <button type="submit" class="btn btn-primary px-4">
+                <button type="submit" class="btn btn-primary">
                     <i class="bi bi-save"></i> {{ "Crear" if modo == "crear" else "Actualizar" }}
                 </button>
             </div>
@@ -85,7 +85,7 @@
 
 <!-- Mensajes -->
 {% if mensaje %}
-<div class="alert alert-warning text-center shadow-sm">{{ mensaje }}</div>
+<div class="alert alert-warning text-center">{{ mensaje }}</div>
 {% endif %}
 
 <!-- Tabla de entregables -->
@@ -119,7 +119,9 @@
                 <td>
                     {% if p.responsables %}
                         {% for resp in p.responsables %}
-                            <span class="badge rounded-pill bg-success px-3 py-2">{{ resp.nombre or resp.responsable_nombre }}</span>
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success me-1">
+                                {{ resp.nombre or resp.responsable_nombre }}
+                            </span>
                         {% endfor %}
                     {% else %}
                         <span class="text-muted fst-italic">Sin responsables</span>
@@ -139,9 +141,11 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     const inputTimestamp = document.getElementById('fechaModificacion');
-    if (inputTimestamp) inputTimestamp.value = new Date().toISOString();
+    if (inputTimestamp) {
+        inputTimestamp.value = new Date().toISOString();
+    }
 });
 </script>
 {% endblock %}
