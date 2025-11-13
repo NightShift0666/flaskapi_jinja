@@ -30,6 +30,8 @@
             top: 0;
             bottom: 0;
             left: 0;
+            overflow-y: auto;     
+            overflow-x: hidden; 
         }
 
         .sidebar h2 {
@@ -98,6 +100,7 @@
             <a href="{{ url_for('acerca') }}"><i class="bi bi-info-circle"></i> Acerca</a>
             <hr>
             <a href="{{ url_for('rutas_entregables.entregables') }}"><i class="bi bi-box-seam"></i> Entregables</a>
+            <a href="{{ url_for('rutas_responsables.responsables') }}"><i class="bi bi-person"></i> Responsables</a>
             <a href="{{ url_for('rutas_tipos_proyecto.tipos_proyecto') }}"><i class="bi bi-diagram-3"></i> Tipos de proyecto</a>
             <a href="{{ url_for('rutas_tipos_producto.tipos_producto') }}"><i class="bi bi-layers"></i> Tipos de producto</a>
             <a href="{{ url_for('rutas_tipos_responsable.tipos_responsable') }}"><i class="bi bi-person-badge"></i> Tipos de responsable</a>

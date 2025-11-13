@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-semibold text-primary">Gestión de Actividades</h1>
+    </div>
+
+    <!-- Formulario principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post"
+                  action="{{ url_for('rutas_actividades.crear_actividad') if modo == 'crear' else url_for('rutas_actividades.actualizar_actividad') }}">
+                
+                {% if modo == 'actualizar' %}
+                    <div class="mb-3">
+                        <label for="id" class="form-label">ID</label>
+                        <input type="number" class="form-control" id="id" name="id"
+                               value="{{ actividad.id }}" readonly>
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="id_entregable" class="form-label">Entregable</label>
+                    <select class="form-select" id="id_entregable" name="id_entregable" required>
+                        <option value="">Seleccione un tipo</option>
+                        {% for e in entregables %}
+                            <option value="{{ e.id }}" 
+                                    {% if actividad and actividad.id_entregable == e.id %}selected{% endif %}>
+                                {{ e.codigo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+    
+
+                <div class="mb-3">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" class="form-control" id="titulo" name="titulo"
+                           placeholder="Título"
+                           value="{{ actividad.titulo if actividad else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="descripcion" name="descripcion"
+                           placeholder="Descripción"
+                           value="{{ actividad.descripcion if actividad else '' }}" required>
+                </div>
+
+                <div class="col-md-3">
+                <label class="form-label">Fecha inicio</label>
+                <input type="text" class="form-control" name="fecha_inicio" value="{{ actividad.fecha_inicio if actividad else '' }}" required>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Fecha fin prevista</label>
+                <input type="text" class="form-control" name="fecha_fin_prevista" value="{{ actividad.fecha_fin_prevista if actividad else '' }}" required>
+            </div>
+
+            <input type="hidden" name="fecha_modificacion" id="fechaModificacion">
+
+            <div class="col-md-3">
+                <label class="form-label">Fecha finalización</label>
+                <input type="text" class="form-control" name="fecha_finalizacion" value="{{ actividad.fecha_finalizacion if actividad else '' }}" required>
+            </div>
+
+            <div class="mb-3">
+                    <label for="prioridad" class="form-label">Prioridad</label>
+                    <input type="number" class="form-control" id="prioridad" name="prioridad"
+                           placeholder="Prioridad"
+                           value="{{ actividad.prioridad if actividad else '' }}" required>
+                </div>
+
+                 <div class="mb-3">
+                    <label for="porcentaje_avance" class="form-label">Porcentaje de avance</label>
+                    <input type="number" class="form-control" id="porcentaje_avance" name="porcentaje_avance"
+                           placeholder="Porcentaje de avance"
+                           value="{{ actividad.porcentaje_avance if actividad else '' }}" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i>
+                    {{ "Crear" if modo == "crear" else "Actualizar" }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Formulario de búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post" action="{{ url_for('rutas_actividades.buscar_actividad') }}" class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="id_buscar" placeholder="Buscar por ID" required>
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if mensaje %}
+        <div class="alert alert-warning text-center">{{ mensaje }}</div>
+    {% endif %}
+
+    <!-- Tabla de resultados -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Lista de actividades</h5>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Entregable</th>
+                            <th>Título</th>
+                            <th>Descripción</th>
+                            <th>Inicio</th>
+                            <th>Fin prevista</th>
+                            <th>Modificación</th>
+                            <th>Finalización</th>
+                            <th>Prioridad</th>
+                            <th>Porcentaje de avance</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in actividades %}
+                            <tr>
+                                <td>{{ p.id }}</td>
+                                <td>
+                                    {% for e in entregables %}
+                                        {% if e.id == p.id_entregable %}
+                                            {{ e.codigo }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{{ p.titulo }}</td>
+                                <td>{{ p.descripcion }}</td>
+                                <td>{{ p.fecha_inicio }}</td>
+                                <td>{{ p.fecha_fin_prevista }}</td>
+                                <td>{{ p.fecha_modificacion }}</td>
+                                <td>{{ p.fecha_finalizacion }}</td>
+                                <td>{{ p.prioridad }}</td>
+                                <td>{{ p.porcentaje_avance }}</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <form method="post" 
+                                              action="{{ url_for('rutas_actividades.eliminar_actividad', id=p.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if actividades|length == 0 %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">No hay actividades registrados.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputTimestamp = document.getElementById('fechaModificacion');
+    if (inputTimestamp) {
+        inputTimestamp.value = new Date().toISOString();
+    }
+});
+</script>
+{% endblock %}

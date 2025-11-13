@@ -11,6 +11,7 @@ from rutas_usuarios import rutas_usuarios
 from rutas_variables_estrategicas import rutas_variables_estrategicas
 from rutas_estados import rutas_estados
 from rutas_responsables import rutas_responsables
+from rutas_actividades import rutas_actividades
 
 # Crear la instancia de la aplicación Flask
 aplicacion = Flask(__name__)
@@ -26,7 +27,7 @@ aplicacion.register_blueprint(rutas_usuarios)
 aplicacion.register_blueprint(rutas_variables_estrategicas)
 aplicacion.register_blueprint(rutas_estados)
 aplicacion.register_blueprint(rutas_responsables)
-
+aplicacion.register_blueprint(rutas_actividades)
 # ------------------- Rutas principales -------------------
 
 @aplicacion.route("/")
