@@ -1,67 +1,108 @@
 {% extends "base.html" %}
 
 {% block contenido %}
-    <h1>Gestión de Variables de estrategicas</h1>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-semibold text-primary">Gestión de Variables Estratégicas</h1>
+    </div>
 
+    <!-- Formulario principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post"
+                  action="{{ url_for('rutas_variables_estrategicas.crear_variable_estrategica') if modo == 'crear' else url_for('rutas_variables_estrategicas.actualizar_variable_estrategica') }}">
+                
+                {% if modo == 'actualizar' %}
+                    <div class="mb-3">
+                        <label for="id" class="form-label">ID</label>
+                        <input type="number" class="form-control" id="id" name="id"
+                               value="{{ variable_estrategica.id }}" readonly>
+                    </div>
+                {% endif %}
 
-    <form method="post" 
-          action="{{ url_for('rutas_variables_estrategicas.crear_variable_estrategica') if modo == 'crear' else url_for('rutas_variables_estrategicas.actualizar_variable_estrategica') }}">
-        
-        {% if modo == 'actualizar' %}
-            <input type="number" name="id" placeholder="Id"
-                   value="{{ variable_estrategica.id }}" readonly>
-        {% endif %}
-        <!-- Campo titulo -->
-        <input type="text" name="titulo" placeholder="Título"
-               value="{{ variable_estrategica.titulo if variable_estrategica else '' }}" required>
+                <div class="mb-3">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" class="form-control" id="titulo" name="titulo"
+                           placeholder="Título de la variable estratégica"
+                           value="{{ variable_estrategica.titulo if variable_estrategica else '' }}" required>
+                </div>
 
-        <!-- Campo descripcion -->
-        <input type="text" name="descripcion" placeholder="Descripción"
-               value="{{ variable_estrategica.descripcion if variable_estrategica else '' }}" required>
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="descripcion" name="descripcion"
+                           placeholder="Breve descripción"
+                           value="{{ variable_estrategica.descripcion if variable_estrategica else '' }}" required>
+                </div>
 
-        
-        <!-- Botón que cambia dinámicamente -->
-        <button type="submit">
-            {{ "Crear" if modo == "crear" else "Actualizar" }}
-        </button>
-    </form>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i>
+                    {{ "Crear" if modo == "crear" else "Actualizar" }}
+                </button>
+            </form>
+        </div>
+    </div>
 
-    
-    <form method="post" action="{{ url_for('rutas_variables_estrategicas.buscar_variable_estrategica') }}">
-        <input type="text" name="id_buscar" placeholder="Buscar por id" required>
-        <button type="submit">Buscar</button>
-    </form>
+    <!-- Formulario de búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post" action="{{ url_for('rutas_variables_estrategicas.buscar_variable_estrategica') }}" class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="id_buscar" placeholder="Buscar por ID" required>
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <!-- Mensaje de error o notificación -->
     {% if mensaje %}
-        <p style="color: red;">{{ mensaje }}</p>
+        <div class="alert alert-warning text-center">{{ mensaje }}</div>
     {% endif %}
 
-    <table border="1" cellpadding="5" cellspacing="0" style="margin: 20px auto;">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in variables_estrategicas %}
-                <tr>
-                    <td>{{ p.id }}</td>
-                    <td>{{ p.titulo }}</td>
-                    <td>{{ p.descripcion }}</td>
-                    <td>
-
-                        <form method="post" 
-                              action="{{ url_for('rutas_variables_estrategicas.eliminar_variable_estrategica', id=p.id) }}">
-                            <button type="submit">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Tabla de resultados -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Lista de Variables Estratégicas</h5>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Descripción</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in variables_estrategicas %}
+                            <tr>
+                                <td>{{ p.id }}</td>
+                                <td>{{ p.titulo }}</td>
+                                <td>{{ p.descripcion }}</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <form method="post" 
+                                              action="{{ url_for('rutas_variables_estrategicas.eliminar_variable_estrategica', id=p.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if variables_estrategicas|length == 0 %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">No hay variables estratégicas registradas.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
-

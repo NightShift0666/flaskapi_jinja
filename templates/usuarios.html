@@ -1,94 +1,133 @@
 {% extends "base.html" %}
 
 {% block contenido %}
-    <h1>Gestión de Usuarios</h1>
-    <form method="post" 
-          action="{{ url_for('rutas_usuarios.crear_usuario') if modo == 'crear' else url_for('rutas_usuarios.actualizar_usuario') }}">
-        
-        {% if modo == 'actualizar' %}
-            <input type="number" name="id" placeholder="Id"
-                   value="{{ usuario.id }}" readonly>
-        {% endif %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-semibold text-primary">Gestión de Usuarios</h1>
+    </div>
 
-
-        <!-- Campo email -->
-        <input type="text" name="email" placeholder="Email"
-               value="{{ usuario.email if usuario else '' }}" required>
-
-        <!-- Campo contrasena -->
-        <input type="text" name="contrasena" placeholder="Contraseña"
-               value="{{ usuario.contrasena if usuario else '' }}" required>
-
-        <!-- Campo ruta_avatar -->
-        <input type="text" name="ruta_avatar" placeholder="Ruta de avatar"
-               value="{{ usuario.ruta_avatar if usuario else '' }}" required>
-
-        
-
-         <!-- Campo id_tipo_responsable-->
-        <label for="activo">Activo:</label>
-        <select name="activo" id="activo" required>
-            
-
-                <option value=true 
-                        {% if usuario and usuario.activo == true %}selected{% endif %}>
-                    True  
-                </option>
-                <option value=false 
-                        {% if usuario and usuario.activo == false %}selected{% endif %}>
-                    False  
-                </option>
+    <!-- Formulario principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post"
+                  action="{{ url_for('rutas_usuarios.crear_usuario') if modo == 'crear' else url_for('rutas_usuarios.actualizar_usuario') }}">
                 
-        </select>       
-               
-       
+                {% if modo == 'actualizar' %}
+                    <div class="mb-3">
+                        <label for="id" class="form-label">ID</label>
+                        <input type="number" class="form-control" id="id" name="id"
+                               value="{{ usuario.id }}" readonly>
+                    </div>
+                {% endif %}
 
-        <!-- Botón que cambia dinámicamente -->
-        <button type="submit">
-            {{ "Crear" if modo == "crear" else "Actualizar" }}
-        </button>
-    </form>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" id="email" name="email"
+                           placeholder="usuario@ejemplo.com"
+                           value="{{ usuario.email if usuario else '' }}" required>
+                </div>
 
+                <div class="mb-3">
+                    <label for="contrasena" class="form-label">Contraseña</label>
+                    <input type="text" class="form-control" id="contrasena" name="contrasena"
+                           placeholder="Contraseña del usuario"
+                           value="{{ usuario.contrasena if usuario else '' }}" required>
+                </div>
 
-    <form method="post" action="{{ url_for('rutas_usuarios.buscar_usuario') }}">
-        <input type="text" name="id_buscar" placeholder="Buscar por id" required>
-        <button type="submit">Buscar</button>
-    </form>
+                <div class="mb-3">
+                    <label for="ruta_avatar" class="form-label">Ruta de Avatar</label>
+                    <input type="text" class="form-control" id="ruta_avatar" name="ruta_avatar"
+                           placeholder="Ejemplo: /static/img/avatar.png"
+                           value="{{ usuario.ruta_avatar if usuario else '' }}" required>
+                </div>
 
-    <!-- Mensaje de error o notificación -->
+                <div class="mb-3">
+                    <label for="activo" class="form-label">Activo</label>
+                    <select class="form-select" id="activo" name="activo" required>
+                        <option value="true" {% if usuario and usuario.activo == true %}selected{% endif %}>True</option>
+                        <option value="false" {% if usuario and usuario.activo == false %}selected{% endif %}>False</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i>
+                    {{ "Crear" if modo == "crear" else "Actualizar" }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Formulario de búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post" action="{{ url_for('rutas_usuarios.buscar_usuario') }}" class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="id_buscar" placeholder="Buscar por ID" required>
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {% if mensaje %}
-        <p style="color: red;">{{ mensaje }}</p>
+        <div class="alert alert-warning text-center">{{ mensaje }}</div>
     {% endif %}
 
-
-    <table border="1" cellpadding="5" cellspacing="0" style="margin: 20px auto;">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Email</th>
-                <th>Contrasena</th>
-                <th>Ruta de avatar</th>
-                <th>Activo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in usuarios %}
-                <tr>
-                    <td>{{ p.id }}</td>
-                    <td>{{ p.email }}</td>
-                    <td>{{ p.contrasena }}</td>
-                    <td>{{ p.ruta_avatar}}</td>
-                    <td>{{ p.activo}}</td>
-                    <td>
-
-                        <form method="post" 
-                              action="{{ url_for('rutas_usuarios.eliminar_usuario', id=p.id) }}">
-                            <button type="submit">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Tabla de resultados -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Lista de Usuarios</h5>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Contraseña</th>
+                            <th>Ruta Avatar</th>
+                            <th>Activo</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in usuarios %}
+                            <tr>
+                                <td>{{ p.id }}</td>
+                                <td>{{ p.email }}</td>
+                                <td>{{ p.contrasena }}</td>
+                                <td>{{ p.ruta_avatar }}</td>
+                                <td>
+                                    {% if p.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <form method="post" 
+                                              action="{{ url_for('rutas_usuarios.eliminar_usuario', id=p.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if usuarios|length == 0 %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">No hay usuarios registrados.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
