@@ -67,7 +67,6 @@ def buscar_tipo_proyecto():
 def crear_tipo_proyecto():
     
     datos = {
-        "id" : request.form.get("id"),
         "nombre": request.form.get("nombre"),
         "descripcion" : request.form.get("descripcion")
     }  

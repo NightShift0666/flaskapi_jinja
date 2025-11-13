@@ -65,7 +65,6 @@ def buscar_entregable():
 def crear_entregable():
     
     datos ={
-        "id": request.form.get("id"),
         "codigo": request.form.get("codigo"),
         "titulo": request.form.get("titulo"),
         "descripcion": request.form.get("descripcion"),

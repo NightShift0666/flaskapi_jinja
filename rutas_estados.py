@@ -67,7 +67,6 @@ def buscar_estado():
 def crear_estado():
     
     datos = {
-        "id" : request.form.get("id"),
         "nombre": request.form.get("nombre"),
         "descripcion" : request.form.get("descripcion")
     }  

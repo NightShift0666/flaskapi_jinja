@@ -67,7 +67,6 @@ def buscar_tipo_responsable():
 def crear_tipo_responsable():
 
     datos = {
-        "id": request.form.get("id"),
         "titulo": request.form.get("titulo"),
         "descripcion": request.form.get("descripcion")
     }

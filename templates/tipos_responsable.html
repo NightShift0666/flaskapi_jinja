@@ -7,9 +7,10 @@
     <form method="post" 
           action="{{ url_for('rutas_tipos_responsable.crear_tipo_responsable') if modo == 'crear' else url_for('rutas_tipos_responsable.actualizar_tipo_responsable') }}">
         
-        <!-- Campo id -->
-        <input type="number" name="id" placeholder="Id"
-               value="{{ tipo_responsable.id if tipo_responsable else '' }}" required>
+       {% if modo == 'actualizar' %}
+            <input type="number" name="id" placeholder="Id"
+                   value="{{ tipo_responsable.id }}" readonly>
+        {% endif %}
 
         <!-- Campo titulo -->
         <input type="text" name="titulo" placeholder="Título"

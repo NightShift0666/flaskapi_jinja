@@ -59,7 +59,6 @@ def buscar_usuario():
 def crear_usuario():
     
     datos = {
-        "id" : request.form.get("id"),
         "email": request.form.get("email"),
         "contrasena" : request.form.get("contrasena"),
         "ruta_avatar" : request.form.get("ruta_avatar"),

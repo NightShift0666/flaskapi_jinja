@@ -11,9 +11,10 @@
     <form method="post" 
           action="{{ url_for('rutas_tipos_producto.crear_tipo_producto') if modo == 'crear' else url_for('rutas_tipos_producto.actualizar_tipo_producto') }}">
         
-        <!-- Campo id -->
-        <input type="number" name="id" placeholder="Id"
-               value="{{ tipo_producto.id if tipo_producto else '' }}" required>
+        {% if modo == 'actualizar' %}
+            <input type="number" name="id" placeholder="Id"
+                   value="{{ tipo_producto.id }}" readonly>
+        {% endif %}
 
         <!-- Campo nombre -->
         <input type="text" name="nombre" placeholder="Nombre"

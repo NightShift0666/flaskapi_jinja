@@ -58,10 +58,9 @@ def buscar_variable_estrategica():
 @rutas_variables_estrategicas.route("/variables_estrategicas/crear", methods=["POST"]) 
 def crear_variable_estrategica():
     datos = {
-        "id": request.form.get("id"),
-        "titulo": request.form.get("titulo"),
-        "descripcion": request.form.get("descripcion")
         
+        "titulo": request.form.get("titulo"),
+        "descripcion": request.form.get("descripcion")  
     }   
     
     try:

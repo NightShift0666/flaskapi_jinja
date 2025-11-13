@@ -34,20 +34,25 @@
                
         <input type="hidden" name="fecha_modificacion" id="fechaModificacion">
         
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const inputTimestamp = document.getElementById('fechaModificacion');
-        const now = new Date();
-        
-       
-        const timestampFormateado = now.toISOString(); 
-        
-        inputTimestamp.value = timestampFormateado;
-    });
-      </script>      
         <!-- Campo fecha_finalizacion -->
         <input type="text" name="fecha_finalizacion" placeholder="Fecha de finalización"
-               value="{{ entregable.fecha_finalizacion if entregable else '' }}" required>       
+               value="{{ entregable.fecha_finalizacion if entregable else '' }}" required>
+
+        <!-- NUEVO: Selector de responsables -->
+        <label for="responsables">Responsables asignados:</label>
+        <select name="responsables[]" id="responsables" multiple size="5" style="width: 100%; min-height: 100px;">
+            {% for resp in todos_responsables %}
+                <option value="{{ resp.id }}" 
+                        {% if entregable and entregable.responsables %}
+                            {% for r in entregable.responsables %}
+                                {% if r.id_responsable == resp.id or r.id == resp.id %}selected{% endif %}
+                            {% endfor %}
+                        {% endif %}>
+                    {{ resp.nombre }}
+                </option>
+            {% endfor %}
+        </select>
+        <small>Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples responsables</small>
 
         <!-- Botón que cambia dinámicamente -->
         <button type="submit">
@@ -55,6 +60,14 @@
         </button>
     </form>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputTimestamp = document.getElementById('fechaModificacion');
+        const now = new Date();
+        const timestampFormateado = now.toISOString(); 
+        inputTimestamp.value = timestampFormateado;
+    });
+    </script>
 
     <form method="post" action="{{ url_for('rutas_entregables.buscar_entregable') }}">
         <input type="text" name="id_buscar" placeholder="Buscar por id" required>
@@ -69,7 +82,6 @@
     <table border="1" cellpadding="5" cellspacing="0" style="margin: 20px auto;">
         <thead>
             <tr>
-
                 <th>Id</th>
                 <th>Código</th>
                 <th>Título</th>
@@ -78,6 +90,7 @@
                 <th>Fecha de finalización prevista</th>
                 <th>Fecha de modificación</th>
                 <th>Fecha de finalización</th>
+                <th>Responsables</th> <!-- NUEVA COLUMNA -->
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -93,6 +106,19 @@
                     <td>{{ p.fecha_modificacion }}</td>
                     <td>{{ p.fecha_finalizacion }}</td>
                     <td>
+                        <!-- MOSTRAR RESPONSABLES -->
+                        {% if p.responsables %}
+                            {% for resp in p.responsables %}
+                                <span style="display: inline-block; background-color: #4CAF50; color: white; 
+                                             padding: 3px 8px; margin: 2px; border-radius: 3px; font-size: 0.85em;">
+                                    {{ resp.nombre or resp.responsable_nombre }}
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <em style="color: #999;">Sin responsables</em>
+                        {% endif %}
+                    </td>
+                    <td>
                         <!-- Formulario para eliminar un producto -->
                         <form method="post" 
                               action="{{ url_for('rutas_entregables.eliminar_entregable', id=p.id) }}">
@@ -104,4 +130,3 @@
         </tbody>
     </table>
 {% endblock %}
-

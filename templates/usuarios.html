@@ -5,9 +5,11 @@
     <form method="post" 
           action="{{ url_for('rutas_usuarios.crear_usuario') if modo == 'crear' else url_for('rutas_usuarios.actualizar_usuario') }}">
         
-        <!-- Campo id -->
-        <input type="text" name="id" placeholder="Id"
-               value="{{ usuario.id if usuario else '' }}" required>
+        {% if modo == 'actualizar' %}
+            <input type="number" name="id" placeholder="Id"
+                   value="{{ usuario.id }}" readonly>
+        {% endif %}
+
 
         <!-- Campo email -->
         <input type="text" name="email" placeholder="Email"
@@ -21,9 +23,24 @@
         <input type="text" name="ruta_avatar" placeholder="Ruta de avatar"
                value="{{ usuario.ruta_avatar if usuario else '' }}" required>
 
-        <!-- Campo activo -->
-        <input type="text" name="activo" placeholder="Activo"
-               value="{{ usuario.activo if usuario else '' }}" required>
+        
+
+         <!-- Campo id_tipo_responsable-->
+        <label for="activo">Activo:</label>
+        <select name="activo" id="activo" required>
+            
+
+                <option value=true 
+                        {% if usuario and usuario.activo == true %}selected{% endif %}>
+                    True  
+                </option>
+                <option value=false 
+                        {% if usuario and usuario.activo == false %}selected{% endif %}>
+                    False  
+                </option>
+                
+        </select>       
+               
        
 
         <!-- Botón que cambia dinámicamente -->

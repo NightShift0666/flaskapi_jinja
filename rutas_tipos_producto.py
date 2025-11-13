@@ -66,7 +66,6 @@ def buscar_tipo_producto():
 def crear_tipo_producto():
 
     datos = {
-        "id": request.form.get("id"),
         "nombre": request.form.get("nombre"),
         "descripcion": request.form.get("descripcion")
     }

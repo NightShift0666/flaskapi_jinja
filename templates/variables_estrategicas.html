@@ -7,9 +7,10 @@
     <form method="post" 
           action="{{ url_for('rutas_variables_estrategicas.crear_variable_estrategica') if modo == 'crear' else url_for('rutas_variables_estrategicas.actualizar_variable_estrategica') }}">
         
-        <!-- Campo id -->
-        <input type="number" name="id" placeholder="Id"
-               value="{{ variable_estrategica.id if variable_estrategica else '' }}" required>
+        {% if modo == 'actualizar' %}
+            <input type="number" name="id" placeholder="Id"
+                   value="{{ variable_estrategica.id }}" readonly>
+        {% endif %}
         <!-- Campo titulo -->
         <input type="text" name="titulo" placeholder="Título"
                value="{{ variable_estrategica.titulo if variable_estrategica else '' }}" required>
