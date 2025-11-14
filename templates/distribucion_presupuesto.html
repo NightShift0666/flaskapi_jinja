@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-semibold text-primary">Gestión de Distribución Presupuesto</h1>
+    </div>
+
+    <!-- Formulario principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post"
+                  action="{{ url_for('rutas_distribucion_presupuesto.crear_distribucion_presupuesto') if modo == 'crear' else url_for('rutas_distribucion_presupuesto.actualizar_distribucion_presupuesto') }}">
+                
+                {% if modo == 'actualizar' %}
+                    <div class="mb-3">
+                        <label for="id" class="form-label">ID</label>
+                        <input type="number" class="form-control" id="id" name="id"
+                               value="{{ distribucion.id }}" readonly>
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="presupuesto_padre_id" class="form-label">Presupuesto Padre</label>
+                    <select class="form-select" id="presupuesto_padre_id" name="presupuesto_padre_id" required>
+                        <option value="">Seleccione un presupuesto padre</option>
+                        {% for presupuesto in presupuestos %}
+                            <option value="{{ presupuesto.id }}" 
+                                    {% if distribucion and distribucion.presupuesto_padre_id == presupuesto.id %}selected{% endif %}>
+                                ID: {{ presupuesto.id }} - Proyecto: {{ presupuesto.id_proyecto }} - Año: {{ presupuesto.periodo_anio }} - Estado: {{ presupuesto.estado }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="proyecto_hijo_id" class="form-label">Proyecto Hijo</label>
+                    <select class="form-select" id="proyecto_hijo_id" name="proyecto_hijo_id" required>
+                        <option value="">Seleccione un proyecto hijo</option>
+                        {% for proyecto in proyectos %}
+                            <option value="{{ proyecto.id }}" 
+                                    {% if distribucion and distribucion.proyecto_hijo_id == proyecto.id %}selected{% endif %}>
+                                ID: {{ proyecto.id }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="monto_asignado" class="form-label">Monto Asignado</label>
+                    <input type="number" step="0.01" class="form-control" id="monto_asignado" name="monto_asignado"
+                           placeholder="Monto asignado"
+                           value="{{ distribucion.monto_asignado if distribucion else '' }}" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i>
+                    {{ "Crear" if modo == "crear" else "Actualizar" }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Formulario de búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post" action="{{ url_for('rutas_distribucion_presupuesto.buscar_distribucion_presupuesto') }}" class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="id_buscar" placeholder="Buscar por ID" required>
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if mensaje %}
+        <div class="alert alert-warning text-center">{{ mensaje }}</div>
+    {% endif %}
+
+    <!-- Tabla de resultados -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Lista de Distribuciones Presupuesto</h5>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Presupuesto Padre</th>
+                            <th>Proyecto Hijo</th>
+                            <th>Monto Asignado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in distribuciones %}
+                            <tr>
+                                <td>{{ d.id }}</td>
+                                <td>
+                                    {% for presupuesto in presupuestos %}
+                                        {% if presupuesto.id == d.presupuesto_padre_id %}
+                                            <small>
+                                                <strong>ID:</strong> {{ presupuesto.id }}<br>
+                                                <strong>Proyecto:</strong> {{ presupuesto.id_proyecto }}<br>
+                                                <strong>Año:</strong> {{ presupuesto.periodo_anio }}
+                                            </small>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{{ d.proyecto_hijo_id }}</td>
+                                <td>
+                                    <strong class="text-success">${{ "{:,.2f}".format(d.monto_asignado) if d.monto_asignado else '0.00' }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <form method="post" 
+                                              action="{{ url_for('rutas_distribucion_presupuesto.eliminar_distribucion_presupuesto', id=d.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if distribuciones|length == 0 %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">No hay distribuciones presupuesto registradas.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

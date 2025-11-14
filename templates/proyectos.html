@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<h1 class="mb-4 text-center">Gestión de Proyectos</h1>
+
+<!-- Formulario Crear/Actualizar -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="post" 
+              action="{{ url_for('rutas_proyectos.crear_proyecto') if modo == 'crear' else url_for('rutas_proyectos.actualizar_proyecto') }}" 
+              class="row g-3">
+
+            {% if modo == 'actualizar' %}
+            <div class="col-md-2">
+                <label class="form-label">ID</label>
+                <input type="number" class="form-control" name="id" value="{{ proyecto.id }}" readonly>
+            </div>
+            {% endif %}
+
+            <div class="col-md-4">
+                <label class="form-label">Proyecto Padre</label>
+                <select name="id_proyecto_padre" class="form-select">
+                    <option value="">Sin proyecto padre</option>
+                    {% for p in todos_proyectos %}
+                        {% if not proyecto or p.id != proyecto.id %}
+                        <option value="{{ p.id }}" 
+                            {% if proyecto and proyecto.id_proyecto_padre == p.id %}selected{% endif %}>
+                            {{ p.codigo }} - {{ p.titulo }}
+                        </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Responsable</label>
+                <select name="id_responsable" class="form-select">
+                    <option value="">Sin responsable</option>
+                    {% for resp in todos_responsables %}
+                        <option value="{{ resp.id }}" 
+                            {% if proyecto and proyecto.id_responsable == resp.id %}selected{% endif %}>
+                            {{ resp.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Tipo de Proyecto</label>
+                <select name="id_tipo_proyecto" class="form-select">
+                    <option value="">Sin tipo</option>
+                    {% for tipo in todos_tipos_proyecto %}
+                        <option value="{{ tipo.id }}" 
+                            {% if proyecto and proyecto.id_tipo_proyecto == tipo.id %}selected{% endif %}>
+                            {{ tipo.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Código</label>
+                <input type="text" class="form-control" name="codigo" value="{{ proyecto.codigo if proyecto else '' }}" required>
+            </div>
+
+            <div class="col-md-5">
+                <label class="form-label">Título</label>
+                <input type="text" class="form-control" name="titulo" value="{{ proyecto.titulo if proyecto else '' }}" required>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Descripción</label>
+                <textarea class="form-control" name="descripcion" rows="2" required>{{ proyecto.descripcion if proyecto else '' }}</textarea>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Fecha inicio</label>
+                <input type="text" class="form-control" name="fecha_inicio" value="{{ proyecto.fecha_inicio if proyecto else '' }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Fecha fin prevista</label>
+                <input type="text" class="form-control" name="fecha_fin_prevista" value="{{ proyecto.fecha_fin_prevista if proyecto else '' }}">
+            </div>
+
+            <input type="hidden" name="fecha_modificacion" id="fechaModificacion">
+
+            <div class="col-md-3">
+                <label class="form-label">Fecha finalización</label>
+                <input type="text" class="form-control" name="fecha_finalizacion" value="{{ proyecto.fecha_finalizacion if proyecto else '' }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Ruta Logo</label>
+                <input type="text" class="form-control" name="ruta_logo" value="{{ proyecto.ruta_logo if proyecto else '' }}" placeholder="/static/logos/...">
+            </div>
+
+            {% if modo == 'actualizar' %}
+            <div class="col-md-6">
+                <label for="metas" class="form-label">Asignar Metas</label>
+                <select name="metas[]" id="metas" class="form-select" multiple>
+                    {% for meta in todas_metas %}
+                        <option value="{{ meta.id }}"
+                            {% if proyecto and proyecto.metas %}
+                                {% for m in proyecto.metas %}
+                                    {% if m.id_meta == meta.id or m.id == meta.id %}selected{% endif %}
+                                {% endfor %}
+                            {% endif %}>
+                            {{ meta.nombre or meta.descripcion }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Usa Ctrl (Cmd en Mac) para seleccionar múltiples</small>
+            </div>
+
+            <div class="col-md-6">
+                <label for="estados" class="form-label">Asignar Estados</label>
+                <select name="estados[]" id="estados" class="form-select" multiple>
+                    {% for estado in todos_estados %}
+                        <option value="{{ estado.id }}"
+                            {% if proyecto and proyecto.estados %}
+                                {% for e in proyecto.estados %}
+                                    {% if e.id_estado == estado.id or e.id == estado.id %}selected{% endif %}
+                                {% endfor %}
+                            {% endif %}>
+                            {{ estado.nombre or estado.descripcion }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Usa Ctrl (Cmd en Mac) para seleccionar múltiples</small>
+            </div>
+            {% endif %}
+
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> {{ "Crear" if modo == "crear" else "Actualizar" }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Buscar por ID -->
+<form method="post" action="{{ url_for('rutas_proyectos.buscar_proyecto') }}" class="d-flex mb-3">
+    <input type="text" name="id_buscar" class="form-control me-2" placeholder="Buscar por ID" required>
+    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> Buscar</button>
+</form>
+
+<!-- Mensajes -->
+{% if mensaje %}
+<div class="alert alert-warning text-center">{{ mensaje }}</div>
+{% endif %}
+
+<!-- Tabla de proyectos -->
+<div class="table-responsive">
+    <table class="table table-hover align-middle bg-white shadow-sm rounded">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Proyecto Padre</th>
+                <th>Responsable</th>
+                <th>Tipo</th>
+                <th>Código</th>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Inicio</th>
+                <th>Fin prevista</th>
+                <th>Modificación</th>
+                <th>Finalización</th>
+                <th>Ruta Logo</th>
+                <th>Metas</th>
+                <th>Estados</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in proyectos %}
+            <tr>
+                <td>{{ p.id }}</td>
+                <td>
+                    {% if p.proyecto_padre_info %}
+                        <span class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary">
+                            {{ p.proyecto_padre_info.codigo }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted fst-italic">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if p.responsable_info %}
+                        <span class="badge rounded-pill bg-success-subtle text-success border border-success">
+                            {{ p.responsable_info.nombre }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted fst-italic">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if p.tipo_proyecto_info %}
+                        <span class="badge rounded-pill bg-info-subtle text-info border border-info">
+                            {{ p.tipo_proyecto_info.nombre }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted fst-italic">-</span>
+                    {% endif %}
+                </td>
+                <td>{{ p.codigo }}</td>
+                <td>{{ p.titulo }}</td>
+                <td>{{ p.descripcion }}</td>
+                <td>{{ p.fecha_inicio or '-' }}</td>
+                <td>{{ p.fecha_fin_prevista or '-' }}</td>
+                <td>{{ p.fecha_modificacion or '-' }}</td>
+                <td>{{ p.fecha_finalizacion or '-' }}</td>
+                <td>{{ p.ruta_logo or '-' }}</td>
+                <td>
+                    {% if p.metas %}
+                        {% for meta in p.metas %}
+                            <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning me-1">
+                                {{ meta.nombre or meta.meta_nombre or 'Meta' }}
+                            </span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted fst-italic">Sin metas</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if p.estados %}
+                        {% for estado in p.estados %}
+                            <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary me-1">
+                                {{ estado.nombre or estado.estado_nombre or 'Estado' }}
+                            </span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted fst-italic">Sin estados</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="post" action="{{ url_for('rutas_proyectos.eliminar_proyecto', id=p.id) }}">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputTimestamp = document.getElementById('fechaModificacion');
+    if (inputTimestamp) {
+        inputTimestamp.value = new Date().toISOString();
+    }
+});
+</script>
+{% endblock %}

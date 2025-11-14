@@ -50,7 +50,7 @@
             </div>
 
             {% if modo == 'actualizar' %}
-            <div class="col-md-6">
+            <div class="col-12">
                 <label for="responsables" class="form-label">Asignar responsables</label>
                 <select name="responsables[]" id="responsables" class="form-select" multiple>
                     {% for resp in todos_responsables %}
@@ -64,24 +64,7 @@
                         </option>
                     {% endfor %}
                 </select>
-                <small class="text-muted">Usa Ctrl para seleccionar múltiples</small>
-            </div>
-
-            <div class="col-md-6">
-                <label for="productos" class="form-label">Asignar productos</label>
-                <select name="productos[]" id="productos" class="form-select" multiple>
-                    {% for prod in todos_productos %}
-                        <option value="{{ prod.id }}"
-                            {% if entregable and entregable.productos %}
-                                {% for p in entregable.productos %}
-                                    {% if p.id_producto == prod.id or p.id == prod.id %}selected{% endif %}
-                                {% endfor %}
-                            {% endif %}>
-                            {{ prod.codigo }} - {{ prod.titulo }}
-                        </option>
-                    {% endfor %}
-                </select>
-                <small class="text-muted">Usa Ctrl para seleccionar múltiples</small>
+                <small class="text-muted">Usa Ctrl (Cmd en Mac) para seleccionar múltiples responsables</small>
             </div>
             {% endif %}
 
@@ -119,7 +102,6 @@
                 <th>Modificación</th>
                 <th>Finalización</th>
                 <th>Responsables</th>
-                <th>Productos</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -143,17 +125,6 @@
                         {% endfor %}
                     {% else %}
                         <span class="text-muted fst-italic">Sin responsables</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if p.productos %}
-                        {% for prod in p.productos %}
-                            <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary me-1">
-                                {{ prod.codigo or prod.producto_codigo }}
-                            </span>
-                        {% endfor %}
-                    {% else %}
-                        <span class="text-muted fst-italic">Sin productos</span>
                     {% endif %}
                 </td>
                 <td>

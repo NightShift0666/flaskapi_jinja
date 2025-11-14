@@ -4,7 +4,7 @@ from flask import Flask, render_template
 # Importar el Blueprint que contiene las rutas de productos
 from rutas_productos import rutas_productos
 from rutas_tipos_producto import rutas_tipos_producto
-from rutas_entregables import rutas_entregables
+from rutas_entregables1 import rutas_entregables
 from rutas_tipo_responsable import rutas_tipos_responsable
 from rutas_tipos_proyecto import rutas_tipos_proyecto
 from rutas_usuarios import rutas_usuarios
@@ -12,6 +12,12 @@ from rutas_variables_estrategicas import rutas_variables_estrategicas
 from rutas_estados import rutas_estados
 from rutas_responsables import rutas_responsables
 from rutas_actividades import rutas_actividades
+from rutas_presupuesto import rutas_presupuesto
+from rutas_objetivo_estrategico import rutas_objetivo_estrategico
+from rutas_ejecucion_presupuesto import rutas_ejecucion_presupuesto
+from rutas_distribucion_presupuesto import rutas_distribucion_presupuesto
+from rutas_proyectos import rutas_proyectos
+
 
 # Crear la instancia de la aplicación Flask
 aplicacion = Flask(__name__)
@@ -28,6 +34,12 @@ aplicacion.register_blueprint(rutas_variables_estrategicas)
 aplicacion.register_blueprint(rutas_estados)
 aplicacion.register_blueprint(rutas_responsables)
 aplicacion.register_blueprint(rutas_actividades)
+aplicacion.register_blueprint(rutas_presupuesto)
+aplicacion.register_blueprint(rutas_objetivo_estrategico)
+aplicacion.register_blueprint(rutas_ejecucion_presupuesto)
+aplicacion.register_blueprint(rutas_distribucion_presupuesto)
+aplicacion.register_blueprint(rutas_proyectos)
+
 # ------------------- Rutas principales -------------------
 
 @aplicacion.route("/")

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-semibold text-primary">Gestión de Objetivos Estratégicos</h1>
+    </div>
+
+    <!-- Formulario principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post"
+                  action="{{ url_for('rutas_objetivo_estrategico.crear_objetivo_estrategico') if modo == 'crear' else url_for('rutas_objetivo_estrategico.actualizar_objetivo_estrategico') }}">
+                
+                {% if modo == 'actualizar' %}
+                    <div class="mb-3">
+                        <label for="id" class="form-label">ID</label>
+                        <input type="number" class="form-control" id="id" name="id"
+                               value="{{ objetivo.id }}" readonly>
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="id_var" class="form-label">Variable Estratégica</label>
+                    <select class="form-select" id="id_var" name="id_var" required>
+                        <option value="">Seleccione una variable estratégica</option>
+                        {% for variable in variables_estrategicas %}
+                            <option value="{{ variable.id }}" 
+                                    {% if objetivo and objetivo.id_var == variable.id %}selected{% endif %}>
+                                {{ variable.titulo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" class="form-control" id="titulo" name="titulo"
+                           placeholder="Título del objetivo estratégico"
+                           value="{{ objetivo.titulo if objetivo else '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="descripcion" name="descripcion" rows="3"
+                              placeholder="Descripción del objetivo estratégico" required>{{ objetivo.descripcion if objetivo else '' }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i>
+                    {{ "Crear" if modo == "crear" else "Actualizar" }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Formulario de búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post" action="{{ url_for('rutas_objetivo_estrategico.buscar_objetivo_estrategico') }}" class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="id_buscar" placeholder="Buscar por ID" required>
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if mensaje %}
+        <div class="alert alert-warning text-center">{{ mensaje }}</div>
+    {% endif %}
+
+    <!-- Tabla de resultados -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Lista de Objetivos Estratégicos</h5>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Variable Estratégica</th>
+                            <th>Título</th>
+                            <th>Descripción</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in objetivos %}
+                            <tr>
+                                <td>{{ obj.id }}</td>
+                                <td>
+                                    {% for variable in variables_estrategicas %}
+                                        {% if variable.id == obj.id_var %}
+                                            {{ variable.titulo }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{{ obj.titulo }}</td>
+                                <td>{{ obj.descripcion[:50] + '...' if obj.descripcion|length > 50 else obj.descripcion }}</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <form method="post" 
+                                              action="{{ url_for('rutas_objetivo_estrategico.eliminar_objetivo_estrategico', id=obj.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if objetivos|length == 0 %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">No hay objetivos estratégicos registrados.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

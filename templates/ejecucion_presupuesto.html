@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-semibold text-primary">Gestión de Ejecución Presupuesto</h1>
+    </div>
+
+    <!-- Formulario principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post"
+                  action="{{ url_for('rutas_ejecucion_presupuesto.crear_ejecucion_presupuesto') if modo == 'crear' else url_for('rutas_ejecucion_presupuesto.actualizar_ejecucion_presupuesto') }}">
+                
+                {% if modo == 'actualizar' %}
+                    <div class="mb-3">
+                        <label for="id" class="form-label">ID</label>
+                        <input type="number" class="form-control" id="id" name="id"
+                               value="{{ ejecucion.id }}" readonly>
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="presupuesto_id" class="form-label">Presupuesto</label>
+                    <select class="form-select" id="presupuesto_id" name="presupuesto_id" required>
+                        <option value="">Seleccione un presupuesto</option>
+                        {% for presupuesto in presupuestos %}
+                            <option value="{{ presupuesto.id }}" 
+                                    {% if ejecucion and ejecucion.presupuesto_id == presupuesto.id %}selected{% endif %}>
+                                ID: {{ presupuesto.id }} - Proyecto: {{ presupuesto.id_proyecto }} - Año: {{ presupuesto.periodo_anio }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="anio" class="form-label">Año</label>
+                    <input type="number" class="form-control" id="anio" name="anio"
+                           placeholder="Año de ejecución"
+                           value="{{ ejecucion.anio if ejecucion else '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="monto_planeado" class="form-label">Monto Planeado</label>
+                    <input type="number" step="0.01" class="form-control" id="monto_planeado" name="monto_planeado"
+                           placeholder="Monto planeado"
+                           value="{{ ejecucion.monto_planeado if ejecucion else '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="monto_ejecutado" class="form-label">Monto Ejecutado</label>
+                    <input type="number" step="0.01" class="form-control" id="monto_ejecutado" name="monto_ejecutado"
+                           placeholder="Monto ejecutado"
+                           value="{{ ejecucion.monto_ejecutado if ejecucion else '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="observaciones" class="form-label">Observaciones</label>
+                    <textarea class="form-control" id="observaciones" name="observaciones" rows="3"
+                              placeholder="Observaciones (opcional)">{{ ejecucion.observaciones if ejecucion and ejecucion.observaciones else '' }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i>
+                    {{ "Crear" if modo == "crear" else "Actualizar" }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Formulario de búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="post" action="{{ url_for('rutas_ejecucion_presupuesto.buscar_ejecucion_presupuesto') }}" class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="id_buscar" placeholder="Buscar por ID" required>
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if mensaje %}
+        <div class="alert alert-warning text-center">{{ mensaje }}</div>
+    {% endif %}
+
+    <!-- Tabla de resultados -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Lista de Ejecuciones Presupuesto</h5>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>ID Presupuesto</th>
+                            <th>Año</th>
+                            <th>Monto Planeado</th>
+                            <th>Monto Ejecutado</th>
+                            <th>% Ejecución</th>
+                            <th>Observaciones</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in ejecuciones %}
+                            <tr>
+                                <td>{{ e.id }}</td>
+                                <td>{{ e.presupuesto_id }}</td>
+                                <td>{{ e.anio }}</td>
+                                <td>${{ "{:,.2f}".format(e.monto_planeado) if e.monto_planeado else '0.00' }}</td>
+                                <td>${{ "{:,.2f}".format(e.monto_ejecutado) if e.monto_ejecutado else '0.00' }}</td>
+                                <td>
+                                    {% if e.monto_planeado and e.monto_planeado > 0 %}
+                                        {% set porcentaje = (e.monto_ejecutado / e.monto_planeado * 100) %}
+                                        <span class="badge bg-{{ 'success' if porcentaje >= 90 else 'warning' if porcentaje >= 70 else 'danger' }}">
+                                            {{ "{:.1f}".format(porcentaje) }}%
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ e.observaciones[:30] + '...' if e.observaciones and e.observaciones|length > 30 else (e.observaciones if e.observaciones else '-') }}</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <form method="post" 
+                                              action="{{ url_for('rutas_ejecucion_presupuesto.eliminar_ejecucion_presupuesto', id=e.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if ejecuciones|length == 0 %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-3">No hay ejecuciones presupuesto registradas.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
