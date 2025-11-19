@@ -1,5 +1,8 @@
 # Importar la clase principal de Flask y la función para renderizar plantillas
 from flask import Flask, render_template
+from flask import Flask, session
+from rutas_auth import rutas_auth
+from middleware_auth import login_required
 
 # Importar el Blueprint que contiene las rutas de productos
 from rutas_productos import rutas_productos
@@ -21,6 +24,7 @@ from rutas_proyectos import rutas_proyectos
 
 # Crear la instancia de la aplicación Flask
 aplicacion = Flask(__name__)
+aplicacion.secret_key = "tu_clave_secreta_super_segura_12345"
 
 # ------------------- Registro de Blueprints -------------------
 # Registrar el Blueprint de productos en la aplicación principal
@@ -40,9 +44,18 @@ aplicacion.register_blueprint(rutas_ejecucion_presupuesto)
 aplicacion.register_blueprint(rutas_distribucion_presupuesto)
 aplicacion.register_blueprint(rutas_proyectos)
 
+
+
+
+
+aplicacion.register_blueprint(rutas_auth)
+
+
+
 # ------------------- Rutas principales -------------------
 
 @aplicacion.route("/")
+@login_required
 def inicio():
     """
     Función asociada a la ruta principal (/).

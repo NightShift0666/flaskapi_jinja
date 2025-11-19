@@ -118,6 +118,16 @@
             
             
         </nav>
+        <div class="navbar-nav ms-auto">
+    {% if session.logged_in %}
+        <span class="navbar-text me-3">
+            <i class="bi bi-person-circle"></i> {{ session.usuario_email }}
+        </span>
+        <a class="btn btn-outline-danger btn-sm" href="{{ url_for('rutas_auth.logout') }}">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </a>
+    {% endif %}
+</div>
     </aside>
 
     <!-- Contenido principal -->
